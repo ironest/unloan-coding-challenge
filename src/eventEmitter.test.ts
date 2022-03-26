@@ -111,6 +111,19 @@ describe("EventEmitter", () => {
     expect(callbacks[1].mock.calls.length).toBe(0);
     expect(callbacks[2].mock.calls.length).toBe(1);
   });
+
+  it("can unregister EVERY callbacks from a given event", () => {
+    const eventEmitter = new EventEmitter();
+    const callbacks = [jest.fn(), jest.fn(), jest.fn()];
+    eventEmitter.register("mouseClick", callbacks[0]);
+    eventEmitter.register("mouseClick", callbacks[1]);
+    eventEmitter.register("mouseClick", callbacks[2]);
+    eventEmitter.unregisterAll("mouseClick");
+    eventEmitter.emit("mouseClick", {});
+    expect(callbacks[0].mock.calls.length).toBe(0);
+    expect(callbacks[1].mock.calls.length).toBe(0);
+    expect(callbacks[2].mock.calls.length).toBe(0);
+  });
 });
 
 // Generates a (virtually) unique object with a random alphanumeric key and random value

@@ -21,6 +21,10 @@ export class EventEmitter {
     );
   }
 
+  unregisterAll(eventType: string): void {
+    delete this.listeners[eventType];
+  }
+
   emit(eventType: string, payload: Object): void {
     const callbacks = this.listeners[eventType] || [];
     callbacks.map((callback) => callback(payload));
