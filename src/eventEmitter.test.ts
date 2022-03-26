@@ -51,21 +51,23 @@ describe("EventEmitter", () => {
 
     const mouseClickCallback = jest.fn();
     const keyPressCallback = jest.fn();
-    const payload = {};
+    const mouseClickPayload = getRandomPayload();
+    const keyPressPayload = getRandomPayload();
+
     eventEmitter.register("mouseClick", mouseClickCallback);
     eventEmitter.register("keyPress", keyPressCallback);
-    eventEmitter.emit("mouseClick", payload);
-    eventEmitter.emit("keyPress", payload);
+    eventEmitter.emit("mouseClick", mouseClickPayload);
+    eventEmitter.emit("keyPress", keyPressPayload);
 
     // check correctess on mouseClick event
     expect(mouseClickCallback.mock.calls.length).toBe(1);
     const mouseClickCallbackParam1 = mouseClickCallback.mock.calls[0][0];
-    expect(mouseClickCallbackParam1).toBe(payload);
+    expect(mouseClickCallbackParam1).toBe(mouseClickPayload);
 
     // check correctess on keyPress event
     expect(keyPressCallback.mock.calls.length).toBe(1);
     const keyPressCallbackParam1 = keyPressCallback.mock.calls[0][0];
-    expect(keyPressCallbackParam1).toBe(payload);
+    expect(keyPressCallbackParam1).toBe(keyPressPayload);
   });
 
   it("can register multiple callbacks for a given event", () => {
@@ -83,3 +85,10 @@ describe("EventEmitter", () => {
     });
   });
 });
+
+// Generates a (virtually) unique object with a random alphanumeric key and random value
+function getRandomPayload(): { [key: string]: number } {
+  const key = Math.random().toString(36).slice(-5);
+  const value = Math.random();
+  return { [key]: value };
+}
