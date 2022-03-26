@@ -72,16 +72,22 @@ describe("EventEmitter", () => {
 
   it("can register multiple callbacks for a given event", () => {
     const eventEmitter = new EventEmitter();
-    const callbacks = [jest.fn(), jest.fn(), jest.fn()];
-    const payload = {};
-    callbacks.forEach((cb) => {
-      eventEmitter.register("mouseClick", cb);
+
+    // Dynamically generate 5 entries having same type but different payloads
+    const mockData = Array(5).map(() => {
+      return {
+        eventType: "mouseClick",
+        callback: jest.fn(),
+        payload: getRandomPayload(),
+      };
     });
-    eventEmitter.emit("mouseClick", payload);
-    callbacks.forEach((cb) => {
-      expect(cb.mock.calls.length).toBe(1);
-      const cbParam1 = cb.mock.calls[0][0];
-      expect(cbParam1).toBe(payload);
+
+    mockData.forEach((md) => {
+      eventEmitter.register(md.eventType, md.callback);
+      eventEmitter.emit(md.eventType, md.payload);
+      expect(md.callback.mock.calls.length).toBe(1);
+      const cbParam = md.callback.mock.calls[0][0];
+      expect(cbParam).toBe(md.payload);
     });
   });
 
