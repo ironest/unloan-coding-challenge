@@ -9,11 +9,13 @@ export class EventEmitter {
     this.listeners = {};
   }
 
-  register(eventType: string, handler: Function) {
-    throw new Error("Method not implemented.");
+  register(eventType: string, handler: Function): void {
+    this.listeners[eventType] = this.listeners[eventType] || [];
+    this.listeners[eventType].push(handler);
   }
 
-  emit(eventType: string, payload: Object) {
-    throw new Error("Method not implemented.");
+  emit(eventType: string, payload: Object): void {
+    const callbacks = this.listeners[eventType] || [];
+    callbacks.map((callback) => callback(payload));
   }
 }
