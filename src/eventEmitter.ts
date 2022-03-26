@@ -34,4 +34,12 @@ export class EventEmitter {
     const callbacks = this.listeners[eventType] || [];
     callbacks.map((callback) => callback(payload));
   }
+
+  getAllEventTypes(): string[] {
+    return Object.keys(this.listeners);
+  }
+
+  getCallbacksByEventType(eventType: string): Function[] {
+    return this.listeners[eventType] || [];
+  }
 }

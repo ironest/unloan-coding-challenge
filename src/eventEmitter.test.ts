@@ -87,7 +87,7 @@ describe("EventEmitter", () => {
       eventEmitter.emit(md.eventType, md.payload);
       expect(md.callback.mock.calls.length).toBe(1);
       const cbParam = md.callback.mock.calls[0][0];
-      expect(cbParam).toBe(md.payload);
+      expect(cbParam).toEqual(md.payload);
     });
   });
 
@@ -138,6 +138,27 @@ describe("EventEmitter", () => {
     eventEmitter.register("mouseClick", callback);
     eventEmitter.emit("mouseClick", {});
     expect(callback.mock.calls.length).toBe(1);
+  });
+
+  it("Can return all registered event types", () => {
+    const eventEmitter = new EventEmitter();
+    eventEmitter.register("mouseClick", jest.fn());
+    eventEmitter.register("keyPress", jest.fn());
+    eventEmitter.register("pageScroll", jest.fn());
+
+    const existingEvents = eventEmitter.getAllEventTypes();
+    expect(existingEvents).toEqual(["mouseClick", "keyPress", "pageScroll"]);
+  });
+
+  it("Can return all callbacks given an event types", () => {
+    const eventEmitter = new EventEmitter();
+    const callbacks = [jest.fn(), jest.fn(), jest.fn()];
+    eventEmitter.register("mouseClick", callbacks[0]);
+    eventEmitter.register("mouseClick", callbacks[1]);
+    eventEmitter.register("mouseClick", callbacks[2]);
+
+    const existingCb = eventEmitter.getCallbacksByEventType("mouseClick");
+    expect(existingCb).toEqual(callbacks);
   });
 });
 
