@@ -85,6 +85,18 @@ describe("EventEmitter", () => {
     });
   });
 
+  it("can unregister a given event", () => {
+    const eventEmitter = new EventEmitter();
+    const callback = jest.fn();
+    eventEmitter.register("mouseClick", callback);
+    eventEmitter.emit("mouseClick", {});
+    eventEmitter.unregister("mouseClick", callback);
+    eventEmitter.emit("mouseClick", {});
+    eventEmitter.emit("mouseClick", {});
+    eventEmitter.emit("mouseClick", {});
+    expect(callback.mock.calls.length).toBe(1);
+  });
+
   it("can unregister a given event and preserve other registrations", () => {
     const eventEmitter = new EventEmitter();
     const callbacks = [jest.fn(), jest.fn(), jest.fn()];
