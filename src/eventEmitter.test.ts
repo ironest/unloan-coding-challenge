@@ -130,6 +130,15 @@ describe("EventEmitter", () => {
     expect(callbacks[1].mock.calls.length).toBe(0);
     expect(callbacks[2].mock.calls.length).toBe(0);
   });
+
+  it("Ensure uniqueness of registrations (for the same eventype and same callback)", () => {
+    const eventEmitter = new EventEmitter();
+    const callback = jest.fn();
+    eventEmitter.register("mouseClick", callback);
+    eventEmitter.register("mouseClick", callback);
+    eventEmitter.emit("mouseClick", {});
+    expect(callback.mock.calls.length).toBe(1);
+  });
 });
 
 // Generates a (virtually) unique object with a random alphanumeric key and random value

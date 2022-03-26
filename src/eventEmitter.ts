@@ -11,6 +11,11 @@ export class EventEmitter {
 
   register(eventType: string, handler: Function): void {
     this.listeners[eventType] = this.listeners[eventType] || [];
+
+    for (const callback of this.listeners[eventType]) {
+      // Early return if registration already exists
+      if (callback === handler) return;
+    }
     this.listeners[eventType].push(handler);
   }
 
