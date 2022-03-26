@@ -24,6 +24,11 @@ export class EventEmitter {
     this.listeners[eventType] = currListeners.filter(
       (callback: Function) => callback !== handler
     );
+
+    // If no other eventTypes are left, removing the key
+    if (!this.listeners[eventType].length) {
+      delete this.listeners[eventType];
+    }
   }
 
   unregisterAll(eventType: string): void {
