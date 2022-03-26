@@ -35,7 +35,7 @@ describe("EventEmitter", () => {
     expect(eventEmitter).toBeInstanceOf(EventEmitter);
   });
 
-  it.skip("can register a callback for a given event", () => {
+  it("can register a callback for a given event", () => {
     const eventEmitter = new EventEmitter();
     const callback = jest.fn();
     const payload = {};
@@ -46,7 +46,7 @@ describe("EventEmitter", () => {
     expect(callbackParam1).toBe(payload);
   });
 
-  it.skip("can register different callbacks for a different events", () => {
+  it("can register different callbacks for a different events", () => {
     const eventEmitter = new EventEmitter();
     const mouseClickCallback = jest.fn();
     const keyPressCallback = jest.fn();
@@ -60,7 +60,7 @@ describe("EventEmitter", () => {
     expect(keyPressCallback.mock.calls.length).toBe(0);
   });
 
-  it.skip("can register multiple callbacks for a given event", () => {
+  it("can register multiple callbacks for a given event", () => {
     const eventEmitter = new EventEmitter();
     const callbacks = [jest.fn(), jest.fn(), jest.fn()];
     const payload = {};
