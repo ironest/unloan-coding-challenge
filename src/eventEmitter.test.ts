@@ -84,6 +84,21 @@ describe("EventEmitter", () => {
       expect(cbParam1).toBe(payload);
     });
   });
+
+  it("can unregister a given event and preserve other registrations", () => {
+    const eventEmitter = new EventEmitter();
+    const callbacks = [jest.fn(), jest.fn(), jest.fn()];
+    eventEmitter.register("mouseClick", callbacks[0]);
+    eventEmitter.register("mouseClick", callbacks[1]);
+    eventEmitter.register("mouseClick", callbacks[2]);
+
+    eventEmitter.unregister("mouseClick", callbacks[1]);
+
+    eventEmitter.emit("mouseClick", {});
+    expect(callbacks[0].mock.calls.length).toBe(1);
+    expect(callbacks[1].mock.calls.length).toBe(0);
+    expect(callbacks[2].mock.calls.length).toBe(1);
+  });
 });
 
 // Generates a (virtually) unique object with a random alphanumeric key and random value

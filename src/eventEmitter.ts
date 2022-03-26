@@ -14,6 +14,13 @@ export class EventEmitter {
     this.listeners[eventType].push(handler);
   }
 
+  unregister(eventType: string, handler: Function): void {
+    const currListeners = this.listeners[eventType] || [];
+    this.listeners[eventType] = currListeners.filter(
+      (callback: Function) => callback !== handler
+    );
+  }
+
   emit(eventType: string, payload: Object): void {
     const callbacks = this.listeners[eventType] || [];
     callbacks.map((callback) => callback(payload));
