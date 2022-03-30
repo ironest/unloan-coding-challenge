@@ -1,3 +1,5 @@
+import { EventType, AnyEventPayload } from "./types";
+
 interface IListener {
   [key: string]: Function[];
 }
@@ -9,7 +11,10 @@ export class EventEmitter {
     this.listeners = {};
   }
 
-  register(eventType: string, handler: Function): void {
+  register(
+    eventType: EventType,
+    handler: (param: AnyEventPayload) => void
+  ): void {
     this.listeners[eventType] = this.listeners[eventType] || [];
 
     for (const callback of this.listeners[eventType]) {
@@ -19,7 +24,10 @@ export class EventEmitter {
     this.listeners[eventType].push(handler);
   }
 
-  unregister(eventType: string, handler: Function): void {
+  unregister(
+    eventType: EventType,
+    handler: (a: AnyEventPayload) => void
+  ): void {
     const currListeners = this.listeners[eventType] || [];
     this.listeners[eventType] = currListeners.filter(
       (callback: Function) => callback !== handler
@@ -31,20 +39,20 @@ export class EventEmitter {
     }
   }
 
-  unregisterAll(eventType: string): void {
+  unregisterAll(eventType: EventType): void {
     delete this.listeners[eventType];
   }
 
-  emit(eventType: string, payload: Object): void {
+  emit(eventType: EventType, payload: AnyEventPayload): void {
     const callbacks = this.listeners[eventType] || [];
     callbacks.map((callback) => callback(payload));
   }
 
-  getAllEventTypes(): string[] {
-    return Object.keys(this.listeners);
+  getAllEventTypes(): EventType[] {
+    return Object.keys(this.listeners) as EventType[];
   }
 
-  getCallbacksByEventType(eventType: string): Function[] {
+  getCallbacksByEventType(eventType: EventType): Function[] {
     return this.listeners[eventType] || [];
   }
 }

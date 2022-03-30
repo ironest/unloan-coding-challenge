@@ -1,4 +1,5 @@
 import { EventEmitter } from "./eventEmitter";
+import { EventType, AnyEventPayload } from "./types";
 
 /**
  * Unloan Event Emitter Coding Challenge
@@ -38,9 +39,9 @@ describe("EventEmitter", () => {
   it("can register a callback for a given event", () => {
     const eventEmitter = new EventEmitter();
     const callback = jest.fn();
-    const payload = {};
-    eventEmitter.register("mouseClick", callback);
-    eventEmitter.emit("mouseClick", payload);
+    const payload = getRandomPayload(EventType.mouseClick);
+    eventEmitter.register(EventType.mouseClick, callback);
+    eventEmitter.emit(EventType.mouseClick, payload);
     expect(callback.mock.calls.length).toBe(1);
     const callbackParam1 = callback.mock.calls[0][0];
     expect(callbackParam1).toBe(payload);
@@ -51,13 +52,13 @@ describe("EventEmitter", () => {
 
     const mouseClickCallback = jest.fn();
     const keyPressCallback = jest.fn();
-    const mouseClickPayload = getRandomPayload();
-    const keyPressPayload = getRandomPayload();
+    const mouseClickPayload = getRandomPayload(EventType.mouseClick);
+    const keyPressPayload = getRandomPayload(EventType.keyPress);
 
-    eventEmitter.register("mouseClick", mouseClickCallback);
-    eventEmitter.register("keyPress", keyPressCallback);
-    eventEmitter.emit("mouseClick", mouseClickPayload);
-    eventEmitter.emit("keyPress", keyPressPayload);
+    eventEmitter.register(EventType.mouseClick, mouseClickCallback);
+    eventEmitter.register(EventType.keyPress, keyPressCallback);
+    eventEmitter.emit(EventType.mouseClick, mouseClickPayload);
+    eventEmitter.emit(EventType.keyPress, keyPressPayload);
 
     // check correctess on mouseClick event
     expect(mouseClickCallback.mock.calls.length).toBe(1);
@@ -76,9 +77,9 @@ describe("EventEmitter", () => {
     // Dynamically generate 5 entries having same type but different payloads
     const mockData = Array(5).map(() => {
       return {
-        eventType: "mouseClick",
+        eventType: EventType.mouseClick,
         callback: jest.fn(),
-        payload: getRandomPayload(),
+        payload: getRandomPayload(EventType.mouseClick),
       };
     });
 
@@ -94,25 +95,40 @@ describe("EventEmitter", () => {
   it("can unregister a given event", () => {
     const eventEmitter = new EventEmitter();
     const callback = jest.fn();
-    eventEmitter.register("mouseClick", callback);
-    eventEmitter.emit("mouseClick", {});
-    eventEmitter.unregister("mouseClick", callback);
-    eventEmitter.emit("mouseClick", {});
-    eventEmitter.emit("mouseClick", {});
-    eventEmitter.emit("mouseClick", {});
+    eventEmitter.register(EventType.mouseClick, callback);
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
+    eventEmitter.unregister(EventType.mouseClick, callback);
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
     expect(callback.mock.calls.length).toBe(1);
   });
 
   it("can unregister a given event and preserve other registrations", () => {
     const eventEmitter = new EventEmitter();
     const callbacks = [jest.fn(), jest.fn(), jest.fn()];
-    eventEmitter.register("mouseClick", callbacks[0]);
-    eventEmitter.register("mouseClick", callbacks[1]);
-    eventEmitter.register("mouseClick", callbacks[2]);
+    eventEmitter.register(EventType.mouseClick, callbacks[0]);
+    eventEmitter.register(EventType.mouseClick, callbacks[1]);
+    eventEmitter.register(EventType.mouseClick, callbacks[2]);
 
-    eventEmitter.unregister("mouseClick", callbacks[1]);
+    eventEmitter.unregister(EventType.mouseClick, callbacks[1]);
 
-    eventEmitter.emit("mouseClick", {});
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
     expect(callbacks[0].mock.calls.length).toBe(1);
     expect(callbacks[1].mock.calls.length).toBe(0);
     expect(callbacks[2].mock.calls.length).toBe(1);
@@ -121,11 +137,14 @@ describe("EventEmitter", () => {
   it("can unregister EVERY callbacks from a given event", () => {
     const eventEmitter = new EventEmitter();
     const callbacks = [jest.fn(), jest.fn(), jest.fn()];
-    eventEmitter.register("mouseClick", callbacks[0]);
-    eventEmitter.register("mouseClick", callbacks[1]);
-    eventEmitter.register("mouseClick", callbacks[2]);
-    eventEmitter.unregisterAll("mouseClick");
-    eventEmitter.emit("mouseClick", {});
+    eventEmitter.register(EventType.mouseClick, callbacks[0]);
+    eventEmitter.register(EventType.mouseClick, callbacks[1]);
+    eventEmitter.register(EventType.mouseClick, callbacks[2]);
+    eventEmitter.unregisterAll(EventType.mouseClick);
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
     expect(callbacks[0].mock.calls.length).toBe(0);
     expect(callbacks[1].mock.calls.length).toBe(0);
     expect(callbacks[2].mock.calls.length).toBe(0);
@@ -134,37 +153,56 @@ describe("EventEmitter", () => {
   it("Ensure uniqueness of registrations (for the same eventype and same callback)", () => {
     const eventEmitter = new EventEmitter();
     const callback = jest.fn();
-    eventEmitter.register("mouseClick", callback);
-    eventEmitter.register("mouseClick", callback);
-    eventEmitter.emit("mouseClick", {});
+    eventEmitter.register(EventType.mouseClick, callback);
+    eventEmitter.register(EventType.mouseClick, callback);
+    eventEmitter.emit(
+      EventType.mouseClick,
+      getRandomPayload(EventType.mouseClick)
+    );
     expect(callback.mock.calls.length).toBe(1);
   });
 
   it("Can return all registered event types", () => {
     const eventEmitter = new EventEmitter();
-    eventEmitter.register("mouseClick", jest.fn());
-    eventEmitter.register("keyPress", jest.fn());
-    eventEmitter.register("pageScroll", jest.fn());
+    eventEmitter.register(EventType.mouseClick, jest.fn());
+    eventEmitter.register(EventType.keyPress, jest.fn());
+    eventEmitter.register(EventType.pageScroll, jest.fn());
 
     const existingEvents = eventEmitter.getAllEventTypes();
-    expect(existingEvents).toEqual(["mouseClick", "keyPress", "pageScroll"]);
+    expect(existingEvents).toEqual([
+      EventType.mouseClick,
+      EventType.keyPress,
+      EventType.pageScroll,
+    ]);
   });
 
   it("Can return all callbacks given an event types", () => {
     const eventEmitter = new EventEmitter();
     const callbacks = [jest.fn(), jest.fn(), jest.fn()];
-    eventEmitter.register("mouseClick", callbacks[0]);
-    eventEmitter.register("mouseClick", callbacks[1]);
-    eventEmitter.register("mouseClick", callbacks[2]);
+    eventEmitter.register(EventType.mouseClick, callbacks[0]);
+    eventEmitter.register(EventType.mouseClick, callbacks[1]);
+    eventEmitter.register(EventType.mouseClick, callbacks[2]);
 
-    const existingCb = eventEmitter.getCallbacksByEventType("mouseClick");
+    const existingCb = eventEmitter.getCallbacksByEventType(
+      EventType.mouseClick
+    );
     expect(existingCb).toEqual(callbacks);
   });
 });
 
-// Generates a (virtually) unique object with a random alphanumeric key and random value
-function getRandomPayload(): { [key: string]: number } {
-  const key = Math.random().toString(36).slice(-5);
-  const value = Math.random();
-  return { [key]: value };
+function getRandomPayload(eventType: EventType): AnyEventPayload {
+  switch (eventType) {
+    case EventType.mouseClick:
+      return { x: Math.random(), y: Math.random() };
+    case EventType.keyPress:
+      return { keyCode: Math.random() };
+      break;
+    case EventType.pageScroll:
+      return { origin: Math.random(), delta: Math.random() };
+      break;
+    case EventType.windowResize:
+      return { width: Math.random(), height: Math.random() };
+    default:
+      throw `Error: unexpected event type: ${eventType}`;
+  }
 }
